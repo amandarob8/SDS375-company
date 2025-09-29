@@ -1,0 +1,87 @@
+---
+title: "Homework 3"
+author: "Amanda Roberts - acr4437"
+date: "2025-09-25"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+set.seed(88)
+
+library(ggplot2)
+library(dplyr)
+library(glue)
+library(colorfindr)
+
+df = read.csv("homework3_data.csv")
+```
+
+### Company Color
+
+```{r fig.width = 6, fig.height = 3}
+company = get_colors("welch.png")
+make_palette(company[1:100, ])
+```
+
+## Recommendation
+
+I recommend that the company move forward with the new design. The first graph, comparing the distribution of NPS under the old and new designs, shows that customers rated the new design more favorably, with the mode shifting upward by one point while maintaining a similar overall shape. The second graph, comparing sales distributions, indicates higher sales under the new design, again with similar shapes but a noticeably higher mean.
+
+Quantitatively, the average sale under the old design was \$31.85, compared to \$35.51 under the new design, for an average increase of \$3.66 per customer. This increase is more than double the company’s threshold of \$1.80, strongly supporting adoption of the new design.
+
+It is worth noting an alternative hypothesis that the redesign could actually decrease sales even though the data suggest otherwise.
+
+## Supporting Evidence
+
+```{r fig.width = 5, fig.height = 5}
+ggplot(df, aes(x = nps, fill = factor(design))) +
+  geom_histogram(binwidth = 1, color = "#1F174E") +
+  facet_wrap(~ design, nrow = 2, 
+             labeller = labeller(design = c("0" = "Old Design", "1" = "New Design"))) +
+  scale_fill_manual(values = c("0" = "#58ABF8",
+                               "1" = "#EB5146")) +
+  labs(
+    title = "Distribution of Net Promoter Scores by Design",
+    x = "Net Promoter Score (0–9)",
+    y = "Count"
+  ) +
+  theme_classic() +
+  theme(legend.position = "none")
+```
+
+```{r fig.width = 6, fig.height = 4}
+ggplot(df, aes(x = "", y = sales, fill = factor(design))) +
+  geom_boxplot(color = "#1F174E") +
+  facet_wrap(~ design, labeller = labeller(design = c("0" = "Old Design", "1" = "New Design"))) +
+  scale_fill_manual(values = c("0" = "#58ABF8",
+                               "1" = "#EB5146")) +
+  labs(
+    title = "Sales by Design (Old vs New)",
+    x = "",
+    y = "Sales ($)"
+  ) +
+  theme_minimal() +
+  theme(legend.position = "none") 
+```
+
+```{r}
+avg_old = df %>% 
+  filter(design == 0) %>% 
+  summarize(avg_old = mean(sales)) %>% 
+  pull()
+avg_new = df %>% 
+  filter(design == 1) %>% 
+  summarize(avg_old = mean(sales)) %>% 
+  pull()
+
+difference = avg_new - avg_old
+
+cat(
+  " Avg Sales Old Design:", round(avg_old, 2), "\n",
+  "Avg Sales New Design:", round(avg_new, 2), "\n",
+  "Difference:", round(difference, 2), "\n"
+)
+```
