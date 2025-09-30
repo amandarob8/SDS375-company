@@ -9,11 +9,13 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, message=FALSE, warning=FALSE}
 set.seed(88)
 
 library(ggplot2)
 library(dplyr)
-library(glue)
 library(colorfindr)
 
 df = read.csv("homework3_data.csv")
